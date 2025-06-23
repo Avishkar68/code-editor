@@ -1,35 +1,64 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState } from 'react';
+import { submitCode } from './Services';
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [code, setCode] = useState("print('Hello, world!')");
+  const [languageId, setLanguageId] = useState(71); // Default: Python
+  const [output, setOutput] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const languageOptions = [
+    { id: 71, name: 'Python 3' },
+    { id: 63, name: 'JavaScript (Node.js)' },
+    { id: 54, name: 'C++ (GCC)' },
+    { id: 62, name: 'Java' },
+    { id: 50, name: 'C' },
+  ];
+
+  const runCode = async () => {
+    setLoading(true);
+    setOutput('');
+
+    const result = await submitCode(code, languageId);
+
+    setOutput(result.output);
+    setLoading(false);
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="App">
+      <h2>🧠 Online Code Runner (Judge0)</h2>
+
+      <select
+        onChange={(e) => setLanguageId(Number(e.target.value))}
+        value={languageId}
+      >
+        {languageOptions.map((lang) => (
+          <option key={lang.id} value={lang.id}>
+            {lang.name}
+          </option>
+        ))}
+      </select>
+
+      <br />
+      <textarea
+        rows={12}
+        cols={70}
+        value={code}
+        onChange={(e) => setCode(e.target.value)}
+        placeholder="Write your code here..."
+      />
+
+      <br />
+      <button onClick={runCode} disabled={loading}>
+        {loading ? 'Running...' : 'Run Code'}
+      </button>
+
+      <h3>Output:</h3>
+      <pre>{output}</pre>
+    </div>
+  );
 }
 
-export default App
+export default App;
